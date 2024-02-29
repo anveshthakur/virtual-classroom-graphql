@@ -1,6 +1,5 @@
 import express from 'express'
 import 'dotenv/config'
-import pkg from 'body-parser'
 import { ApolloServer } from 'apollo-server-express'
 import { userTypeDefs } from './GraphQL/User/UserSchema.js'
 import { userResolvers } from './GraphQL/User/UserResolvers.js'
@@ -11,31 +10,40 @@ import { submissionResolvers } from './GraphQL/Submission/submissionResolvers.js
 import assignmentRouter from './routes/AssignmentRoutes.js'
 import submissionRouter from './routes/SubmissionRoutes.js'
 import authRouter from './routes/IAMRoutes.js'
+import http from 'http'
+import { ApolloServerPluginDrainHttpServer } from 'apollo-server-core'
 
 const app = express()
-app.use(pkg.json())
+app.use(express.json())
 
+app.get('/', (req, res) => {
+    res.send('Welcome to virtual classroom!')
+})
 app.use('/api/v1/auth', authRouter)
 app.use('/api/v1/assignment', assignmentRouter)
 app.use('/api/v1/submission', submissionRouter)
 
-const server = new ApolloServer({
-    typeDefs: [userTypeDefs, assignmentTypeDefs, submissionTypeDefs],
-    resolvers: [userResolvers, assignmentResolvers, submissionResolvers],
-    context: ({ req }) => ({
-        req,
-        customHeaders: {
-            headers: {
-                ...req.headers,
+const httpServer = http.createServer(app)
+
+const startAppolloServer = async (app, httpServer) => {
+    const server = new ApolloServer({
+        typeDefs: [userTypeDefs, assignmentTypeDefs, submissionTypeDefs],
+        resolvers: [userResolvers, assignmentResolvers, submissionResolvers],
+        context: ({ req }) => ({
+            req,
+            customHeaders: {
+                headers: {
+                    ...req.headers,
+                },
             },
-        },
-    }),
-})
+        }),
+        plugins: [ApolloServerPluginDrainHttpServer({ httpServer })],
+    })
 
-await server.start()
+    await server.start()
+    server.applyMiddleware({ app })
+}
 
-server.applyMiddleware({ app })
+startAppolloServer(app, httpServer)
 
-app.listen(process.env.APP_PORT, () => {
-    console.log(`listening on port ${process.env.APP_PORT}`)
-})
+export default httpServer
