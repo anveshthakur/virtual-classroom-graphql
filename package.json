@@ -1,0 +1,28 @@
+{
+  "name": "virtaul-classroom-graphql",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "nodemon src/index.js",
+    "lint:check": "eslint .",
+    "lint:fix": "eslint --fix ."
+  },
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "nodemon": "^3.1.0"
+  },
+  "dependencies": {
+    "apollo-server-express": "^3.13.0",
+    "body-parser": "^1.20.2",
+    "dotenv": "^16.4.5",
+    "eslint-config-prettier": "^9.1.0",
+    "express": "^4.18.2",
+    "graphql": "^16.8.1",
+    "jsonwebtoken": "^9.0.2",
+    "mysql2": "^3.9.2",
+    "prettier": "^3.2.5",
+    "serverless-http": "^3.2.0"
+  }
+}
